@@ -4,8 +4,7 @@ import java.time.LocalDate;
 import java.util.concurrent.atomic.AtomicInteger;
 
 public class Employee {
-    private static final AtomicInteger counter = new AtomicInteger();
-    private final int id;
+    private int id;
     private final String name;
     private final String family;
     private final LocalDate startDate;
@@ -16,7 +15,7 @@ public class Employee {
     private boolean isFired;
 
     public Employee(String name, String family, Department department, Role role, double salary) {
-        this.id = counter.incrementAndGet();
+        this.setId(0);
         this.name = name;
         this.family = family;
         this.startDate = LocalDate.now();
@@ -28,7 +27,7 @@ public class Employee {
     }
 
     public Employee(int id, String name, String family, LocalDate startDate, LocalDate endDate, Department department, Role role, double salary) {
-        this.id = id;
+        this.setId(id);
         this.name = name;
         this.family = family;
         this.startDate = startDate;
@@ -37,6 +36,10 @@ public class Employee {
         this.setRole(role);
         this.setSalary(salary);
         this.isFired = false;
+    }
+
+    public void setId(int id) {
+        this.id = id;
     }
 
     public int getId() {

@@ -55,6 +55,16 @@ public class EmployeeService implements Service<Employee> {
         Role role = Role.getRole(args[3]);
         double salary = Double.parseDouble(args[4]);
         Employee employee = new Employee(name, family, null, role, salary);
+        CsvEmployeeConverter employeeConverter = new CsvEmployeeConverter();
+
+        // Not optimal for unique id and it breaks the principle of Encapsulation, but
+        // we have no other way to be sure that the employee's id always will be the
+        // next number. I tried with AtomicInteger for generating the next number, but
+        // it works only if I create many employees in one application's run. Other problem
+        // here is that if we have really many employees it would be slow.
+        List<Employee> readEmployees = employeeConverter.fromListOfMapsToListOfModel(
+                reader.read(EmployeeService.employeesCSVFilename, Employee.class));
+        employee.setId(readEmployees.getLast().getId() + 1);
 
         CsvDepartmentConverter departmentConverter = new CsvDepartmentConverter();
         List<Department> departments = departmentConverter.fromListOfMapsToListOfModel(
@@ -73,7 +83,6 @@ public class EmployeeService implements Service<Employee> {
                 this.writer.write(EmployeeService.departmentsCSVFilename, departmentConverter.fromListOfModelToListOfMaps(departments));
             }
 
-            CsvEmployeeConverter employeeConverter = new CsvEmployeeConverter();
             List<Employee> employees = new ArrayList<>();
             employees.add(employee);
             this.writer.write(EmployeeService.employeesCSVFilename, employeeConverter.fromListOfModelToListOfMaps(employees));
@@ -98,21 +107,26 @@ public class EmployeeService implements Service<Employee> {
                     throw new RuntimeException("Employee is fired!");
                 }
                 if (employee.getId() == id) {
-                    String[] endDateArgs = args[0].split("-");
-                    LocalDate endDate = LocalDate.of(Integer.parseInt(endDateArgs[0]),
-                            Integer.parseInt(endDateArgs[1]), Integer.parseInt(endDateArgs[2]));
-                    employee.setEndDate(endDate);
-                    if (args[1] != null) {
+                    if(!args[0].isBlank()) {
+                        String[] endDateArgs = args[0].split("-");
+                        LocalDate endDate = LocalDate.of(Integer.parseInt(endDateArgs[0]),
+                                Integer.parseInt(endDateArgs[1]), Integer.parseInt(endDateArgs[2]));
+                        employee.setEndDate(endDate);
+                    }
+                    if (!args[1].isBlank()) {
                         addEmployeeToDepartment(args, employee, this.reader, this.writer);
-                        if (args[2] != null) {
-                            Role role = Role.getRole(args[2]);
-                            employee.setRole(role);
-                            if (args[3] != null) {
-                                double salary = Double.parseDouble(args[3]);
-                                employee.setSalary(salary);
-                            }
-                            this.writer.write(EmployeeService.employeesCSVFilename, employeeConverter.fromListOfModelToListOfMaps(readEmployees));
-                        }
+                    }
+                    if (!args[2].isBlank()) {
+                        Role role = Role.getRole(args[2]);
+                        employee.setRole(role);
+                    }
+                    if (!args[3].isBlank()) {
+                        double salary = Double.parseDouble(args[3]);
+                        employee.setSalary(salary);
+                    }
+                    File file = new File(EmployeeService.employeesCSVFilename);
+                    if(file.delete()) {
+                        this.writer.write(EmployeeService.employeesCSVFilename, employeeConverter.fromListOfModelToListOfMaps(readEmployees));
                     }
                     return employee;
                 }

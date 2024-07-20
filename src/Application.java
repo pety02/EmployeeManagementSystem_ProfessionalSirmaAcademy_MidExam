@@ -1,45 +1,97 @@
 import managers.EmployeeManager;
-import models.Role;
+import models.Employee;
 import services.EmployeeService;
 import utils.Reader;
 import utils.Writer;
 
 import java.util.Scanner;
+import java.util.List;
 
 public class Application {
     private static void initMenu() {
         System.out.println("MENU");
         System.out.println("-------------------------");
-        System.out.println("1. Add Employee");
-        System.out.println("2. Edit Employee");
-        System.out.println("3. Remove Employee");
-        System.out.println("4. Search Employees By");
+        System.out.println("1. Show All Employees");
+        System.out.println("2. Hire Employee");
+        System.out.println("3. Edit Employee");
+        System.out.println("4. Fire Employee");
+        System.out.println("5. Delete Employee");
+        System.out.println("6. Search Employees By");
+    }
+    private static void listAllEmployees(EmployeeManager manager) {
+        List<Employee> allEmployees = manager.listAllEntities();
+
+        System.out.println("All Employees");
+        for(Employee employee : allEmployees) {
+            System.out.print(employee);
+        }
     }
     private static void execute(String command, EmployeeManager employeeManager, Scanner scanner) {
         switch (command) {
-            case "Add Employee" -> {
+            case "Show All Employees" -> {
+                listAllEmployees(employeeManager);
+            }
+            case "Hire Employee" -> {
                 System.out.print("Enter name: ");
                 String name = scanner.nextLine();
                 System.out.print("Enter family: ");
                 String family = scanner.nextLine();
-                System.out.print("Enter department id: ");
-                String departmentId = scanner.nextLine();
+                System.out.print("Enter department name: ");
+                String departmentName = scanner.nextLine();
                 System.out.print("Enter role: ");
                 String role = scanner.nextLine();
                 System.out.print("Enter salary: ");
                 String salary = scanner.nextLine();
 
-                if(employeeManager.addEntity(name, family, departmentId, role, salary)) {
-                    System.out.println("Successfully added employee!");
+                if(employeeManager.addEntity(name, family, departmentName, role, salary)) {
+                    System.out.println("Successfully hired employee!");
+                    System.out.println();
+                    listAllEmployees(employeeManager);
                 } else {
-                    System.out.println("Sorry, we cannot add this employee!");
+                    System.out.println("Sorry, we cannot hire this employee!");
                 }
             }
             case "Edit Employee" -> {
-                return;
+                System.out.print("Enter employee id: ");
+                int id = Integer.parseInt(scanner.nextLine());
+                System.out.print("Enter end date: ");
+                String endDate = scanner.nextLine();
+                System.out.print("Enter department name: ");
+                String departmentName = scanner.nextLine();
+                System.out.print("Enter role: ");
+                String role = scanner.nextLine();
+                System.out.print("Enter salary: ");
+                String salary = scanner.nextLine();
+
+                if(employeeManager.editEntity(id, endDate, departmentName, role, salary)) {
+                    System.out.println("Successfully edited employee!");
+                    System.out.println();
+                    listAllEmployees(employeeManager);
+                } else {
+                    System.out.println("Sorry, we cannot edited this employee!");
+                }
             }
-            case "Remove Employee" -> {
-                return;
+            case "Fire Employee" -> {
+                System.out.print("Enter employee id: ");
+                int id = Integer.parseInt(scanner.nextLine());
+                if(employeeManager.fireEmployee(id)) {
+                    System.out.println("Successfully fired employee!");
+                    System.out.println();
+                    listAllEmployees(employeeManager);
+                } else {
+                    System.out.println("Sorry we cannot fire this employee!");
+                }
+            }
+            case "Delete Employee" -> {
+                System.out.print("Enter employee id: ");
+                int id = Integer.parseInt(scanner.nextLine());
+                if(employeeManager.removeEntity(id)) {
+                    System.out.println("Successfully deleted employee!");
+                    System.out.println();
+                    listAllEmployees(employeeManager);
+                } else {
+                    System.out.println("Sorry we cannot delete this employee!");
+                }
             }
             case "Search Employees By" -> {
                 return;
@@ -54,14 +106,17 @@ public class Application {
         System.out.println("Welcome to Employee Management System!");
         System.out.println();
         initMenu();
-        boolean isRunning = true;
-        Scanner scanner = new Scanner(System.in);
-        String command;
-
+        System.out.println();
         Reader reader = new Reader();
         Writer writer = new Writer();
         EmployeeService employeeService = new EmployeeService(reader, writer);
         EmployeeManager manager = new EmployeeManager(employeeService);
+        listAllEmployees(manager);
+        System.out.println();
+
+        boolean isRunning = true;
+        Scanner scanner = new Scanner(System.in);
+        String command;
         do {
             if(!isRunning) {
                 break;
