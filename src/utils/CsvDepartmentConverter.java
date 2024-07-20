@@ -36,10 +36,15 @@ public class CsvDepartmentConverter implements Convertable<Department> {
         String[] headers = new String[] {"ID", "Name", "Company"};
         Reader reader = new Reader();
         CsvCompanyConverter companyConverter = new CsvCompanyConverter();
-        List<Company> companies = companyConverter.fromListOfMapsToListOfModel(
-                reader.read(CsvDepartmentConverter.companiesFilename, Company.class));
+        List<Company> companies = new ArrayList<>();
+        try {
+            companies = companyConverter.fromListOfMapsToListOfModel(
+                    reader.read(CsvDepartmentConverter.companiesFilename, Company.class));
+        } catch (Exception ex) {
+            ex.fillInStackTrace();
+        }
         for(Department dept : objs) {
-            String[] fields = new String[]{dept.getId() + "", dept.getName(), "null"};
+            String[] fields = new String[]{dept.getId() + "", dept.getName(), dept.getCompany() != null ? dept.getCompany().getName() : "null"};
             Map<String, String> obj = new HashMap<>();
             for (int i = 0; i < headers.length; i++) {
                 obj.put(headers[i], fields[i]);

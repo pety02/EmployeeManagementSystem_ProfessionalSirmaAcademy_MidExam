@@ -16,6 +16,7 @@ public class Department {
         this.id = id;
         this.setName(name);
         this.setEmployees(employees);
+        this.setCompany(company);
     }
 
     public int getId() {
@@ -42,5 +43,13 @@ public class Department {
     public String toString() {
 
         return String.format("%d, %s%n", this.id, this.name);
+    }
+
+    public Company getCompany() {
+        return company;
+    }
+
+    public void setCompany(Company company) {
+        this.company = company;
     }
 }

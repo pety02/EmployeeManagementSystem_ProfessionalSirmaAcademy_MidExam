@@ -35,9 +35,13 @@ public class Application {
     private static void listAllEmployees(EmployeeManager manager) {
         List<Employee> allEmployees = manager.listAllEntities();
 
-        System.out.println("All Employees");
-        for(Employee employee : allEmployees) {
-            System.out.print(employee);
+        if(!allEmployees.isEmpty()) {
+            System.out.println("All Employees");
+            for (Employee employee : allEmployees) {
+                System.out.print(employee);
+            }
+        } else {
+            System.out.println("No employees!");
         }
     }
     private static void execute(String command, EmployeeManager employeeManager, Scanner scanner) {

@@ -29,13 +29,13 @@ public class Reader implements Readable {
 
             String[] headers = headersLine.split(delimiter);
             if(cl == Employee.class) {
-                if (!headers[6].equals("ID") || !headers[7].equals("Name") || !headers[5].equals("Family")
-                        || !headers[3].equals("Start Date") || !headers[4].equals("End Date") || !headers[2].equals("Department")
-                        || !headers[0].equals("Role") || !headers[1].equals("Salary")) {
+                if (!headers[7].equals("ID") || !headers[8].equals("Name") || !headers[6].equals("Family")
+                        || !headers[3].equals("Start Date") || !headers[5].equals("End Date") || !headers[2].equals("Department")
+                        || !headers[0].equals("Role") || !headers[1].equals("Salary") || !headers[4].equals("isFired")) {
                     throw new RuntimeException("Not Employee object");
                 }
             } else if (cl == Department.class) {
-                if(!headers[0].equals("ID") || !headers[1].equals("Name") || !headers[2].equals("Company")) {
+                if(!headers[1].equals("ID") || !headers[2].equals("Name") || !headers[0].equals("Company")) {
                     throw new RuntimeException("Not Department object");
                 }
             } else {
@@ -53,7 +53,7 @@ public class Reader implements Readable {
 
                 data.add(obj);
             }
-        } catch (IOException | RuntimeException ex) {
+        } catch (Exception ex) {
             ex.fillInStackTrace();
         }
 

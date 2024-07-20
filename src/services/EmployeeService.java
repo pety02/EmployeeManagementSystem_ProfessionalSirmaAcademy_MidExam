@@ -61,14 +61,22 @@ public class EmployeeService implements Service<Employee> {
         // it works only if I create many employees in one application's run. Other problem
         // here is that if we have really many employees it would be slow.
         CsvEmployeeConverter employeeConverter = new CsvEmployeeConverter();
-        List<Employee> readEmployees = employeeConverter.fromListOfMapsToListOfModel(
-                reader.read(EmployeeService.employeesCSVFilename, Employee.class));
-        Employee employee = new Employee(readEmployees.getLast().getId() + 1, name, family, null, role, salary);
-
+        List<Employee> readEmployees = new ArrayList<>();
+        try {
+            readEmployees = employeeConverter.fromListOfMapsToListOfModel(
+                    reader.read(EmployeeService.employeesCSVFilename, Employee.class));
+        } catch (Exception ex) {
+            ex.fillInStackTrace();
+        }
         CsvDepartmentConverter departmentConverter = new CsvDepartmentConverter();
-
-        var check = this.reader.read(EmployeeService.departmentsCSVFilename, Department.class);
-        List<Department> departments = departmentConverter.fromListOfMapsToListOfModel(check);
+        List<java.util.Map<String, String>> readDepartments = new ArrayList<>();
+        try {
+            readDepartments = this.reader.read(EmployeeService.departmentsCSVFilename, Department.class);
+        } catch (Exception ex) {
+            ex.fillInStackTrace();
+        }
+        List<Department> departments = !readDepartments.isEmpty() ? departmentConverter.fromListOfMapsToListOfModel(readDepartments) : new ArrayList<>();
+        Employee employee = new Employee(!readEmployees.isEmpty() ? readEmployees.getLast().getId() + 1 : 1, name, family, null, role, salary);
         if(!departments.isEmpty()) {
             for (Department department : departments) {
                 if (department.getName().equals(departmentName)) {
@@ -88,8 +96,13 @@ public class EmployeeService implements Service<Employee> {
             this.writer.write(EmployeeService.employeesCSVFilename, employeeConverter.fromListOfModelToListOfMaps(employees));
 
             return employee;
+        } else {
+            ArrayList<Employee> employees = new ArrayList<>();
+            employees.add(employee);
+            departments.add(new Department(1, departmentName, employees, null));
+            this.writer.write(EmployeeService.employeesCSVFilename, employeeConverter.fromListOfModelToListOfMaps(employees));
+            return employee;
         }
-        throw new RuntimeException("Employee insertion unsuccessful!");
     }
 
     @Override
@@ -185,8 +198,12 @@ public class EmployeeService implements Service<Employee> {
     public List<Employee> listAllEntities() {
         CsvEmployeeConverter employeeConverter = new CsvEmployeeConverter();
 
-        return employeeConverter.fromListOfMapsToListOfModel(
-                this.reader.read(EmployeeService.employeesCSVFilename, Employee.class));
+        try {
+            return employeeConverter.fromListOfMapsToListOfModel(
+                    this.reader.read(EmployeeService.employeesCSVFilename, Employee.class));
+        } catch (Exception ex) {
+            return new ArrayList<>();
+        }
     }
 
     @Override
