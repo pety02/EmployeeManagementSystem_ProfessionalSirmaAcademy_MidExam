@@ -1,17 +1,20 @@
 import managers.EmployeeManager;
-import models.Company;
-import models.Department;
 import models.Employee;
 import services.EmployeeService;
-import utils.CsvCompanyConverter;
 import utils.Reader;
 import utils.Writer;
-
-import java.util.ArrayList;
 import java.util.Scanner;
 import java.util.List;
 
+/**
+ *
+ */
 public class Application {
+    /**
+     *
+     * @param value
+     * @return
+     */
     private static boolean isNumber(String value) {
         for (int i = 0; i < value.length(); i++) {
             if('0' <= value.charAt(i) && value.charAt(i) <= '9') {
@@ -22,6 +25,9 @@ public class Application {
         return false;
     }
 
+    /**
+     *
+     */
     private static void initMenu() {
         System.out.println("MENU");
         System.out.println("-------------------------");
@@ -32,6 +38,11 @@ public class Application {
         System.out.println("5. Delete Employee");
         System.out.println("6. Search Employees By");
     }
+
+    /**
+     *
+     * @param manager
+     */
     private static void listAllEmployees(EmployeeManager manager) {
         List<Employee> allEmployees = manager.listAllEntities();
 
@@ -44,11 +55,20 @@ public class Application {
             System.out.println("No employees!");
         }
     }
+
+    /**
+     *
+     * @param command
+     * @param employeeManager
+     * @param scanner
+     */
     private static void execute(String command, EmployeeManager employeeManager, Scanner scanner) {
         switch (command) {
             case "Show All Employees" -> {
                 listAllEmployees(employeeManager);
             }
+            // Here would be good to be added validation for user input on each case
+            // in order to prevent exceptions or unwanted results
             case "Hire Employee" -> {
                 System.out.print("Enter name: ");
                 String name = scanner.nextLine();
@@ -155,6 +175,11 @@ public class Application {
             }
         }
     }
+
+    /**
+     *
+     * @param args
+     */
     public static void main(String[] args) {
         System.out.println();
         System.out.println("Welcome to Employee Management System!");

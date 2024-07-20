@@ -1,5 +1,8 @@
 package models;
 
+/**
+ *
+ */
 public enum Role {
     SOFTWARE_DEVELOPER,
     FRONT_END_DEVELOPER,
@@ -33,6 +36,11 @@ public enum Role {
     AI_ML_ENGINEER,
     BLOCKCHAIN_DEVELOPER;
 
+    /**
+     *
+     * @param role
+     * @return
+     */
     public static Role getRole(String role) {
         if (role == null) {
             return null;
@@ -41,11 +49,15 @@ public enum Role {
         try {
             return Role.valueOf(role.toUpperCase());
         } catch (IllegalArgumentException e) {
-            // Return null or throw an exception if the role is not found
-            return null;  // Or throw new IllegalArgumentException("No enum constant for role: " + role);
+
+            return null;
         }
     }
 
+    /**
+     *
+     * @return
+     */
     @Override
     public String toString() {
         // Converts the enum name to a more readable format

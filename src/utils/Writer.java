@@ -9,6 +9,9 @@ import java.io.IOException;
 import java.util.List;
 import java.util.Map;
 
+/**
+ *
+ */
 public class Writer implements Writable {
     private static void writeLine(BufferedWriter bw, String[] fields, String csvSeparator) throws IOException {
         StringBuilder line = new StringBuilder();
@@ -21,6 +24,13 @@ public class Writer implements Writable {
         bw.write(line.toString());
         bw.newLine();
     }
+
+    /**
+     *
+     * @param filename
+     * @param objs
+     * @return
+     */
     @Override
     public boolean write(String filename, List<Map<String, String>> objs) {
         String delimiter = ",";

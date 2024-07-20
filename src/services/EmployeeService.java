@@ -14,17 +14,32 @@ import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ *
+ */
 public class EmployeeService implements Service<Employee> {
     private static final String employeesCSVFilename = "employees.csv";
     private static final String departmentsCSVFilename = "departments.csv";
     private final Reader reader;
     private final Writer writer;
 
+    /**
+     *
+     * @param reader
+     * @param writer
+     */
     public EmployeeService(Reader reader, Writer writer) {
         this.reader = reader;
         this.writer = writer;
     }
 
+    /**
+     *
+     * @param args
+     * @param employee
+     * @param reader
+     * @param writer
+     */
     private static void addEmployeeToDepartment(String[] args, Employee employee, Reader reader, Writer writer) {
         String departmentName = args[1];
         CsvDepartmentConverter departmentConverter = new CsvDepartmentConverter();
@@ -44,6 +59,12 @@ public class EmployeeService implements Service<Employee> {
         }
     }
 
+    /**
+     *
+     * @param args
+     * @return
+     * @throws RuntimeException
+     */
     @Override
     public Employee addEntity(String... args) throws RuntimeException {
         if(args.length != 5) {
@@ -105,6 +126,13 @@ public class EmployeeService implements Service<Employee> {
         }
     }
 
+    /**
+     *
+     * @param id
+     * @param args
+     * @return
+     * @throws RuntimeException
+     */
     @Override
     public Employee editEntity(int id, String... args) throws RuntimeException{
         if(args.length == 0 || 4 < args.length) {
@@ -149,6 +177,11 @@ public class EmployeeService implements Service<Employee> {
         throw new RuntimeException("Employee update unsuccessful!");
     }
 
+    /**
+     *
+     * @param id
+     * @return
+     */
     @Override
     public boolean removeEntity(int id) {
         CsvEmployeeConverter employeeConverter = new CsvEmployeeConverter();
@@ -177,6 +210,12 @@ public class EmployeeService implements Service<Employee> {
         return false;
     }
 
+    /**
+     *
+     * @param id
+     * @return
+     * @throws RuntimeException
+     */
     @Override
     public Employee getEntity(int id) throws RuntimeException {
         CsvEmployeeConverter employeeConverter = new CsvEmployeeConverter();
@@ -194,6 +233,10 @@ public class EmployeeService implements Service<Employee> {
         throw new RuntimeException("Employee not found!");
     }
 
+    /**
+     *
+     * @return
+     */
     @Override
     public List<Employee> listAllEntities() {
         CsvEmployeeConverter employeeConverter = new CsvEmployeeConverter();
@@ -206,6 +249,12 @@ public class EmployeeService implements Service<Employee> {
         }
     }
 
+    /**
+     *
+     * @param criteria
+     * @param value
+     * @return
+     */
     @Override
     public List<Employee> searchBy(String criteria, String value) {
         List<Employee> wantedEmployees = new ArrayList<>();

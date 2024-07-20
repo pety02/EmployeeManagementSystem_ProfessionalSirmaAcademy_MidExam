@@ -9,8 +9,16 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+/**
+ *
+ */
 public class CsvCompanyConverter implements Convertable<Company> {
 
+    /**
+     *
+     * @param data
+     * @return
+     */
     @Override
     public List<Company> fromListOfMapsToListOfModel(List<Map<String, String>> data) {
         List<Company> companies = new ArrayList<>();
@@ -31,6 +39,11 @@ public class CsvCompanyConverter implements Convertable<Company> {
         return companies;
     }
 
+    /**
+     *
+     * @param objs
+     * @return
+     */
     @Override
     public List<Map<String, String>> fromListOfModelToListOfMaps(List<Company> objs) {
         List<Map<String, String>> data = new ArrayList<>();

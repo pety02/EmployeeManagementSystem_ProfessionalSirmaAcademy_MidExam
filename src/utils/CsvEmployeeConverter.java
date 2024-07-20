@@ -11,7 +11,15 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+/**
+ *
+ */
 public class CsvEmployeeConverter implements Convertable<Employee> {
+    /**
+     *
+     * @param data
+     * @return
+     */
     @Override
     public List<Employee> fromListOfMapsToListOfModel(List<Map<String, String>> data) {
         List<Employee> employees = new ArrayList<>();
@@ -42,6 +50,11 @@ public class CsvEmployeeConverter implements Convertable<Employee> {
         return employees;
     }
 
+    /**
+     *
+     * @param objs
+     * @return
+     */
     @Override
     public List<Map<String, String>> fromListOfModelToListOfMaps(List<Employee> objs) {
         List<Map<String, String>> data = new ArrayList<>();

@@ -9,8 +9,17 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+/**
+ *
+ */
 public class CsvDepartmentConverter implements Convertable<Department> {
     private static final String companiesFilename = "companies.csv";
+
+    /**
+     *
+     * @param data
+     * @return
+     */
     @Override
     public List<Department> fromListOfMapsToListOfModel(List<Map<String, String>> data) {
         List<Department> departments = new ArrayList<>();
@@ -30,6 +39,11 @@ public class CsvDepartmentConverter implements Convertable<Department> {
         return departments;
     }
 
+    /**
+     *
+     * @param objs
+     * @return
+     */
     @Override
     public List<Map<String, String>> fromListOfModelToListOfMaps(List<Department> objs) {
         List<Map<String, String>> data = new ArrayList<>();

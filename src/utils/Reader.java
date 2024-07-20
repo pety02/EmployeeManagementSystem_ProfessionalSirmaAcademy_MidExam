@@ -13,8 +13,18 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+/**
+ *
+ */
 public class Reader implements Readable {
 
+    /**
+     *
+     * @param filename
+     * @param cl
+     * @return
+     * @param <T>
+     */
     @Override
     public <T> List<Map<String, String>> read(String filename, Class<T> cl) {
         String line;
