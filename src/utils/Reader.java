@@ -34,10 +34,12 @@ public class Reader implements Readable {
                         || !headers[0].equals("Role") || !headers[1].equals("Salary")) {
                     throw new RuntimeException("Not Employee object");
                 }
-            } else if (!headers[0].equals("ID") || !headers[1].equals("Name")) {
-                if(cl == Department.class) {
+            } else if (cl == Department.class) {
+                if(!headers[0].equals("ID") || !headers[1].equals("Name") || !headers[2].equals("Company")) {
                     throw new RuntimeException("Not Department object");
-                } else {
+                }
+            } else {
+                if(!headers[0].equals("ID") || !headers[1].equals("Name") || !headers[2].equals("Department")) {
                     throw new RuntimeException("Not Company object");
                 }
             }

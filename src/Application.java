@@ -1,13 +1,27 @@
 import managers.EmployeeManager;
+import models.Company;
+import models.Department;
 import models.Employee;
 import services.EmployeeService;
+import utils.CsvCompanyConverter;
 import utils.Reader;
 import utils.Writer;
 
+import java.util.ArrayList;
 import java.util.Scanner;
 import java.util.List;
 
 public class Application {
+    private static boolean isNumber(String value) {
+        for (int i = 0; i < value.length(); i++) {
+            if('0' <= value.charAt(i) && value.charAt(i) <= '9') {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
     private static void initMenu() {
         System.out.println("MENU");
         System.out.println("-------------------------");
@@ -94,10 +108,46 @@ public class Application {
                 }
             }
             case "Search Employees By" -> {
-                return;
+                System.out.println("Criterias for searching by are <ID | Name | Department Name>.");
+                System.out.print("Enter search by criteria: ");
+                String criteria;
+                do {
+                    criteria = scanner.nextLine();
+                } while (!criteria.equals("ID") && !criteria.equals("Name") && !criteria.equals("Department Name"));
+                String value;
+                if(criteria.equals("ID")) {
+                    do {
+                        System.out.print("Enter search by criteria value: ");
+                        value = scanner.nextLine();
+                        if(!isNumber(value)) {
+                            System.out.println("The criteria value must be number because the criteria is ID!");
+                        }
+                    } while (!isNumber(value));
+                } else {
+                    System.out.print("Enter search by criteria value: ");
+                    value = scanner.nextLine();
+                }
+                List<Employee> foundEmployees = employeeManager.searchBy(criteria, value);
+                if(!foundEmployees.isEmpty()) {
+                    System.out.println();
+                    System.out.println("Found employees:");
+                    for(Employee employee : foundEmployees) {
+                        System.out.print(employee);
+                    }
+                } else {
+                    System.out.println("Sorry we cannot found employees by this criteria!");
+                }
+            }
+            case "END" -> {
+                System.out.println("Goodbye...");
+                System.exit(0);
             }
             default -> {
-                System.exit(0);
+                System.out.println("Invalid command! View possible commands from the menu!");
+                System.out.println();
+                System.out.print("Enter command: ");
+                command = scanner.nextLine();
+                execute(command, employeeManager, scanner);
             }
         }
     }
@@ -124,7 +174,11 @@ public class Application {
             System.out.print("Enter command: ");
             command = scanner.nextLine();
             execute(command, manager, scanner);
+            if(command.equals("END")) {
+                isRunning = false;
+            }
         } while (isRunning);
+
         System.exit(0);
     }
 }

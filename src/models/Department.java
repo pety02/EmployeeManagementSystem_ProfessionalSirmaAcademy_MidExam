@@ -1,21 +1,18 @@
 package models;
 
 import java.util.ArrayList;
-import java.util.concurrent.atomic.AtomicInteger;
 
 public class Department {
-    private static final AtomicInteger counter = new AtomicInteger();
     private final int id;
     private String name;
     private ArrayList<Employee> employees;
 
-    public Department(String name, ArrayList<Employee> employees) {
-        this.id = counter.incrementAndGet();
-        this.setName(name);
-        this.setEmployees(employees);
-    }
+    // This field is removed for simplicity of the application, but
+    // in real time application it would be appropriate the department
+    // object to know the company that owns it.
+    private Company company;
 
-    public Department(int id, String name, ArrayList<Employee> employees) {
+    public Department(int id, String name, ArrayList<Employee> employees, Company company) {
         this.id = id;
         this.setName(name);
         this.setEmployees(employees);

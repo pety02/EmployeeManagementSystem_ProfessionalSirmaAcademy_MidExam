@@ -60,6 +60,11 @@ public class EmployeeManager implements Manager<Employee> {
         return this.service.listAllEntities();
     }
 
+    @Override
+    public List<Employee> searchBy(String criteria, String value) {
+        return this.service.searchBy(criteria, value);
+    }
+
     public boolean fireEmployee(int id) {
         try {
             CsvEmployeeConverter employeeConverter = new CsvEmployeeConverter();

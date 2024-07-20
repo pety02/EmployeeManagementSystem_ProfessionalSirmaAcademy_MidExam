@@ -38,11 +38,8 @@ public class Writer implements Writable {
                 writeLine(bw, headers, ",");
             }
 
-            for (Map<String, String> row : objs) {
-                String[] fields = new String[headers.length];
-                for (int i = 0; i < headers.length; i++) {
-                    fields[i] = row.get(headers[i]);
-                }
+            for (Map<String, String> obj : objs) {
+                String[] fields = obj.values().toArray(new String[0]);
                 writeLine(bw, fields, delimiter);
             }
 

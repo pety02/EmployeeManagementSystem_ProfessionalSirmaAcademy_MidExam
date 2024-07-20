@@ -1,5 +1,6 @@
 package services.interfaces;
 
+import java.util.LinkedList;
 import java.util.List;
 
 public interface Service<T> {
@@ -8,4 +9,5 @@ public interface Service<T> {
     boolean removeEntity(int id);
     T getEntity(int id) throws RuntimeException;
     List<T> listAllEntities();
+    List<T> searchBy(String criteria, String value);
 }

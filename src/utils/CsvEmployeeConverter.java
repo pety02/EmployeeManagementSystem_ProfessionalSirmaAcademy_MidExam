@@ -30,11 +30,13 @@ public class CsvEmployeeConverter implements Convertable<Employee> {
                 String[] endDateArgs = fields[4].split("-");
                 endDate = LocalDate.of(Integer.parseInt(endDateArgs[0]), Integer.parseInt(endDateArgs[1]), Integer.parseInt(endDateArgs[2]));
             }
-            Department department = new Department(0, fields[2], new ArrayList<>());
+            Department department = new Department(0, fields[2], new ArrayList<>(), null);
             Role role = Role.getRole(fields[0]);
             double salary = Double.parseDouble(fields[1]);
 
-            employees.add(new Employee(id, name, family, startDate, endDate, department, role, salary));
+            Employee currEmployee = new Employee(id, name, family, startDate, endDate, department, role, salary);
+            employees.add(currEmployee);
+            department.getEmployees().add(currEmployee);
         }
 
         return employees;

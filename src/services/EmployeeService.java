@@ -54,21 +54,21 @@ public class EmployeeService implements Service<Employee> {
         String departmentName = args[2];
         Role role = Role.getRole(args[3]);
         double salary = Double.parseDouble(args[4]);
-        Employee employee = new Employee(name, family, null, role, salary);
-        CsvEmployeeConverter employeeConverter = new CsvEmployeeConverter();
 
         // Not optimal for unique id and it breaks the principle of Encapsulation, but
         // we have no other way to be sure that the employee's id always will be the
         // next number. I tried with AtomicInteger for generating the next number, but
         // it works only if I create many employees in one application's run. Other problem
         // here is that if we have really many employees it would be slow.
+        CsvEmployeeConverter employeeConverter = new CsvEmployeeConverter();
         List<Employee> readEmployees = employeeConverter.fromListOfMapsToListOfModel(
                 reader.read(EmployeeService.employeesCSVFilename, Employee.class));
-        employee.setId(readEmployees.getLast().getId() + 1);
+        Employee employee = new Employee(readEmployees.getLast().getId() + 1, name, family, null, role, salary);
 
         CsvDepartmentConverter departmentConverter = new CsvDepartmentConverter();
-        List<Department> departments = departmentConverter.fromListOfMapsToListOfModel(
-                this.reader.read(EmployeeService.departmentsCSVFilename, Department.class));
+
+        var check = this.reader.read(EmployeeService.departmentsCSVFilename, Department.class);
+        List<Department> departments = departmentConverter.fromListOfMapsToListOfModel(check);
         if(!departments.isEmpty()) {
             for (Department department : departments) {
                 if (department.getName().equals(departmentName)) {
@@ -112,6 +112,7 @@ public class EmployeeService implements Service<Employee> {
                         LocalDate endDate = LocalDate.of(Integer.parseInt(endDateArgs[0]),
                                 Integer.parseInt(endDateArgs[1]), Integer.parseInt(endDateArgs[2]));
                         employee.setEndDate(endDate);
+                        employee.setFired();
                     }
                     if (!args[1].isBlank()) {
                         addEmployeeToDepartment(args, employee, this.reader, this.writer);
@@ -186,5 +187,54 @@ public class EmployeeService implements Service<Employee> {
 
         return employeeConverter.fromListOfMapsToListOfModel(
                 this.reader.read(EmployeeService.employeesCSVFilename, Employee.class));
+    }
+
+    @Override
+    public List<Employee> searchBy(String criteria, String value) {
+        List<Employee> wantedEmployees = new ArrayList<>();
+        CsvEmployeeConverter employeeConverter = new CsvEmployeeConverter();
+        List<Employee> readEmployees = employeeConverter.fromListOfMapsToListOfModel(
+                this.reader.read(EmployeeService.employeesCSVFilename, Employee.class));
+
+        switch (criteria) {
+            case "ID" -> {
+                int id = Integer.parseInt(value);
+                for(Employee employee : readEmployees) {
+                    if(employee.getId() == id) {
+                        wantedEmployees.add(employee);
+                        break;
+                    }
+                }
+
+                return wantedEmployees;
+            }
+            case "Name" -> {
+                for(Employee employee : readEmployees) {
+                    if(employee.getName().equals(value)) {
+                        wantedEmployees.add(employee);
+                    }
+                }
+
+                return wantedEmployees;
+            }
+            case "Department Name" -> {
+                CsvDepartmentConverter departmentConverter = new CsvDepartmentConverter();
+                List<Department> readDepartments = departmentConverter.fromListOfMapsToListOfModel(
+                        reader.read(EmployeeService.departmentsCSVFilename, Department.class));
+                for(Employee employee : readEmployees) {
+                    for(Department department : readDepartments) {
+                        if(employee.getDepartment().getName().equals(department.getName())
+                                && department.getName().equals(value)) {
+                            wantedEmployees.add(employee);
+                        }
+                    }
+                }
+
+                return wantedEmployees;
+            }
+            default -> {
+                return readEmployees;
+            }
+        }
     }
 }
