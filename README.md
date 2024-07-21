@@ -63,4 +63,4 @@ The project provides converters that transform objects from the `Employee`, `Dep
 
 1. Clone the repository:
    ```bash
-   git clone <repository URL>
+   git clone <https://github.com/pety02/EmployeeManagementSystem_ProfessionalSirmaAcademy_MidExam/tree/master>
