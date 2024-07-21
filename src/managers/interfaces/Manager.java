@@ -8,5 +8,4 @@ public interface Manager<T> {
     boolean removeEntity(int id);
     T getEntity(int id);
     List<T> listAllEntities();
-    List<T> searchBy(String criteria, String value);
 }

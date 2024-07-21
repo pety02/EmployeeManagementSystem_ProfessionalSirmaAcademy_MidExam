@@ -13,9 +13,12 @@ import java.io.File;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 /**
- *
+ * Service class for managing Employee entities.
+ * Handles operations such as adding, editing,
+ * removing, retrieving, and listing employees.
  */
 public class EmployeeService implements Service<Employee> {
     private static final String employeesCSVFilename = "employees.csv";
@@ -24,9 +27,10 @@ public class EmployeeService implements Service<Employee> {
     private final Writer writer;
 
     /**
+     * Constructs an EmployeeService with the specified Reader and Writer.
      *
-     * @param reader
-     * @param writer
+     * @param reader the Reader for reading data
+     * @param writer the Writer for writing data
      */
     public EmployeeService(Reader reader, Writer writer) {
         this.reader = reader;
@@ -34,19 +38,20 @@ public class EmployeeService implements Service<Employee> {
     }
 
     /**
+     * Adds an employee to the specified department.
      *
-     * @param args
-     * @param employee
-     * @param reader
-     * @param writer
+     * @param args the arguments for the employee
+     * @param employee the employee to be added
+     * @param reader the Reader for reading data
+     * @param writer the Writer for writing data
      */
     private static void addEmployeeToDepartment(String[] args, Employee employee, Reader reader, Writer writer) {
         String departmentName = args[1];
         CsvDepartmentConverter departmentConverter = new CsvDepartmentConverter();
         List<Department> departments = departmentConverter.fromListOfMapsToListOfModel(
                 reader.read(EmployeeService.departmentsCSVFilename, Department.class));
-        for(Department department : departments) {
-            if(department.getName().equals(departmentName)) {
+        for (Department department : departments) {
+            if (department.getName().equals(departmentName)) {
                 department.getEmployees().add(employee);
                 employee.setDepartment(department);
                 break;
@@ -54,20 +59,21 @@ public class EmployeeService implements Service<Employee> {
         }
 
         File departmentsFile = new File(EmployeeService.departmentsCSVFilename);
-        if(departmentsFile.delete()) {
+        if (departmentsFile.delete()) {
             writer.write(EmployeeService.departmentsCSVFilename, departmentConverter.fromListOfModelToListOfMaps(departments));
         }
     }
 
     /**
+     * Adds a new Employee entity.
      *
-     * @param args
-     * @return
-     * @throws RuntimeException
+     * @param args the arguments for creating the employee
+     * @return the created Employee
+     * @throws RuntimeException if the employee creation fails
      */
     @Override
     public Employee addEntity(String... args) throws RuntimeException {
-        if(args.length != 5) {
+        if (args.length != 5) {
             throw new ArrayIndexOutOfBoundsException("Too many arguments for employee creation!");
         }
         String name = args[0];
@@ -90,15 +96,17 @@ public class EmployeeService implements Service<Employee> {
             ex.fillInStackTrace();
         }
         CsvDepartmentConverter departmentConverter = new CsvDepartmentConverter();
-        List<java.util.Map<String, String>> readDepartments = new ArrayList<>();
+        List<Map<String, String>> readDepartments = new ArrayList<>();
         try {
             readDepartments = this.reader.read(EmployeeService.departmentsCSVFilename, Department.class);
         } catch (Exception ex) {
             ex.fillInStackTrace();
         }
-        List<Department> departments = !readDepartments.isEmpty() ? departmentConverter.fromListOfMapsToListOfModel(readDepartments) : new ArrayList<>();
-        Employee employee = new Employee(!readEmployees.isEmpty() ? readEmployees.getLast().getId() + 1 : 1, name, family, null, role, salary);
-        if(!departments.isEmpty()) {
+        List<Department> departments = !readDepartments.isEmpty() ? departmentConverter.
+                fromListOfMapsToListOfModel(readDepartments) : new ArrayList<>();
+        Employee employee = new Employee(!readEmployees.isEmpty() ? readEmployees.
+                get(readEmployees.size() - 1).getId() + 1 : 1, name, family, null, role, salary);
+        if (!departments.isEmpty()) {
             for (Department department : departments) {
                 if (department.getName().equals(departmentName)) {
                     department.getEmployees().add(employee);
@@ -109,46 +117,50 @@ public class EmployeeService implements Service<Employee> {
 
             File departmentsFile = new File(EmployeeService.departmentsCSVFilename);
             if (departmentsFile.delete()) {
-                this.writer.write(EmployeeService.departmentsCSVFilename, departmentConverter.fromListOfModelToListOfMaps(departments));
+                this.writer.write(EmployeeService.departmentsCSVFilename, departmentConverter.
+                        fromListOfModelToListOfMaps(departments));
             }
 
             List<Employee> employees = new ArrayList<>();
             employees.add(employee);
-            this.writer.write(EmployeeService.employeesCSVFilename, employeeConverter.fromListOfModelToListOfMaps(employees));
+            this.writer.write(EmployeeService.employeesCSVFilename, employeeConverter.
+                    fromListOfModelToListOfMaps(employees));
 
             return employee;
         } else {
             ArrayList<Employee> employees = new ArrayList<>();
             employees.add(employee);
             departments.add(new Department(1, departmentName, employees, null));
-            this.writer.write(EmployeeService.employeesCSVFilename, employeeConverter.fromListOfModelToListOfMaps(employees));
+            this.writer.write(EmployeeService.employeesCSVFilename, employeeConverter.
+                    fromListOfModelToListOfMaps(employees));
             return employee;
         }
     }
 
     /**
+     * Edits an existing Employee entity.
      *
-     * @param id
-     * @param args
-     * @return
-     * @throws RuntimeException
+     * @param id the ID of the employee to edit
+     * @param args the arguments for editing the employee
+     * @return the edited Employee
+     * @throws RuntimeException if the employee update fails
      */
     @Override
-    public Employee editEntity(int id, String... args) throws RuntimeException{
-        if(args.length == 0 || 4 < args.length) {
+    public Employee editEntity(int id, String... args) throws RuntimeException {
+        if (args.length == 0 || 4 < args.length) {
             throw new ArrayIndexOutOfBoundsException("Invalid arguments count for employee update!");
         }
         CsvEmployeeConverter employeeConverter = new CsvEmployeeConverter();
 
         List<Employee> readEmployees = employeeConverter.fromListOfMapsToListOfModel(
                 this.reader.read(EmployeeService.employeesCSVFilename, Employee.class));
-        if(!readEmployees.isEmpty()) {
+        if (!readEmployees.isEmpty()) {
             for (Employee employee : readEmployees) {
                 if (employee.isFired()) {
                     throw new RuntimeException("Employee is fired!");
                 }
                 if (employee.getId() == id) {
-                    if(!args[0].isBlank()) {
+                    if (!args[0].isBlank()) {
                         String[] endDateArgs = args[0].split("-");
                         LocalDate endDate = LocalDate.of(Integer.parseInt(endDateArgs[0]),
                                 Integer.parseInt(endDateArgs[1]), Integer.parseInt(endDateArgs[2]));
@@ -167,8 +179,9 @@ public class EmployeeService implements Service<Employee> {
                         employee.setSalary(salary);
                     }
                     File file = new File(EmployeeService.employeesCSVFilename);
-                    if(file.delete()) {
-                        this.writer.write(EmployeeService.employeesCSVFilename, employeeConverter.fromListOfModelToListOfMaps(readEmployees));
+                    if (file.delete()) {
+                        this.writer.write(EmployeeService.employeesCSVFilename, employeeConverter.
+                                fromListOfModelToListOfMaps(readEmployees));
                     }
                     return employee;
                 }
@@ -178,9 +191,10 @@ public class EmployeeService implements Service<Employee> {
     }
 
     /**
+     * Removes an Employee entity by ID.
      *
-     * @param id
-     * @return
+     * @param id the ID of the employee to remove
+     * @return true if the removal was successful, false otherwise
      */
     @Override
     public boolean removeEntity(int id) {
@@ -188,7 +202,7 @@ public class EmployeeService implements Service<Employee> {
 
         List<Employee> readEmployees = employeeConverter.fromListOfMapsToListOfModel(
                 this.reader.read(EmployeeService.employeesCSVFilename, Employee.class));
-        if(!readEmployees.isEmpty()) {
+        if (!readEmployees.isEmpty()) {
             List<Employee> toBeStored = new ArrayList<>();
             for (Employee employee : readEmployees) {
                 if (employee.getId() == id) {
@@ -203,7 +217,8 @@ public class EmployeeService implements Service<Employee> {
 
             File employeesFile = new File(EmployeeService.employeesCSVFilename);
             if (employeesFile.delete()) {
-                this.writer.write(EmployeeService.employeesCSVFilename, employeeConverter.fromListOfModelToListOfMaps(toBeStored));
+                this.writer.write(EmployeeService.employeesCSVFilename, employeeConverter.
+                        fromListOfModelToListOfMaps(toBeStored));
                 return true;
             }
         }
@@ -211,10 +226,11 @@ public class EmployeeService implements Service<Employee> {
     }
 
     /**
+     * Retrieves an Employee entity by ID.
      *
-     * @param id
-     * @return
-     * @throws RuntimeException
+     * @param id the ID of the employee to retrieve
+     * @return the retrieved Employee
+     * @throws RuntimeException if the employee is not found
      */
     @Override
     public Employee getEntity(int id) throws RuntimeException {
@@ -222,7 +238,7 @@ public class EmployeeService implements Service<Employee> {
 
         List<Employee> readEmployees = employeeConverter.fromListOfMapsToListOfModel(
                 this.reader.read(EmployeeService.employeesCSVFilename, Employee.class));
-        if(!readEmployees.isEmpty()) {
+        if (!readEmployees.isEmpty()) {
             for (Employee employee : readEmployees) {
                 if (employee.getId() == id) {
                     return employee;
@@ -234,8 +250,9 @@ public class EmployeeService implements Service<Employee> {
     }
 
     /**
+     * Lists all Employee entities.
      *
-     * @return
+     * @return a list of all employees
      */
     @Override
     public List<Employee> listAllEntities() {
@@ -250,23 +267,22 @@ public class EmployeeService implements Service<Employee> {
     }
 
     /**
-     *
-     * @param criteria
-     * @param value
-     * @return
-     */
-    @Override
+    * Searches for employees by a specified criteria.
+    *
+    * @param criteria the search criteria
+    * @return a list of employees matching the criteria
+    */
     public List<Employee> searchBy(String criteria, String value) {
         List<Employee> wantedEmployees = new ArrayList<>();
         CsvEmployeeConverter employeeConverter = new CsvEmployeeConverter();
         List<Employee> readEmployees = employeeConverter.fromListOfMapsToListOfModel(
-                this.reader.read(EmployeeService.employeesCSVFilename, Employee.class));
+            this.reader.read(EmployeeService.employeesCSVFilename, Employee.class));
 
         switch (criteria) {
             case "ID" -> {
                 int id = Integer.parseInt(value);
-                for(Employee employee : readEmployees) {
-                    if(employee.getId() == id) {
+                for (Employee employee : readEmployees) {
+                    if (employee.getId() == id) {
                         wantedEmployees.add(employee);
                         break;
                     }
@@ -275,8 +291,8 @@ public class EmployeeService implements Service<Employee> {
                 return wantedEmployees;
             }
             case "Name" -> {
-                for(Employee employee : readEmployees) {
-                    if(employee.getName().equals(value)) {
+                for (Employee employee : readEmployees) {
+                    if (employee.getName().equals(value)) {
                         wantedEmployees.add(employee);
                     }
                 }
@@ -286,11 +302,11 @@ public class EmployeeService implements Service<Employee> {
             case "Department Name" -> {
                 CsvDepartmentConverter departmentConverter = new CsvDepartmentConverter();
                 List<Department> readDepartments = departmentConverter.fromListOfMapsToListOfModel(
-                        reader.read(EmployeeService.departmentsCSVFilename, Department.class));
-                for(Employee employee : readEmployees) {
-                    for(Department department : readDepartments) {
-                        if(employee.getDepartment().getName().equals(department.getName())
-                                && department.getName().equals(value)) {
+                    reader.read(EmployeeService.departmentsCSVFilename, Department.class));
+                for (Employee employee : readEmployees) {
+                    for (Department department : readDepartments) {
+                        if (employee.getDepartment().getName().equals(department.getName())
+                            && department.getName().equals(value)) {
                             wantedEmployees.add(employee);
                         }
                     }
